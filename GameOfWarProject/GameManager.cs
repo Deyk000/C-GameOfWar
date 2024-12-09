@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameOfWarProject
 {
-    internal class GameManager
+    public class GameManager
     {
         int totalMoves = 0;
         Queue<Card> firstPlayerDeck = new Queue<Card>();
@@ -54,26 +54,9 @@ namespace GameOfWarProject
 
             }
         }
+
         Card firstPlayerCard;
         Card secondPlayerCard;
-
-        
-
-
-
-
-
-
-
-        bool GameHasWinner()
-        {
-            while(!GameHasWinner())
-            {
-                Console.ReadLine();
-                DealCardsToPlayers();
-            }
-        }
-
 
         public void StartGame()
         {
@@ -111,9 +94,24 @@ namespace GameOfWarProject
             ShuffleDeck(deck);
             DealCardsToPlayers();
 
-
+            //while(!GameHasWinner())
         }
-        
 
+        public bool GameHasWinner()
+        {
+            if (!firstPlayerDeck.Any())
+            {
+                Console.WriteLine($"After a total of {totalMoves} moves, the second player has won!");
+                return true;
+            }
+
+            if (!secondPlayerDeck.Any())
+            {
+                Console.WriteLine($"After a total of {totalMoves} moves, the first player has won!");
+                return true;
+            }
+
+            return false;
+        }
     }
 }
