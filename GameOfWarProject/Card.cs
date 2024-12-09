@@ -10,6 +10,13 @@ namespace GameOfWarProject
     {
         public CardFace Face { get; set; }
         public CardSuit Suite { get; set; }
+
+        public Card(CardFace face, CardSuit suite)
+        {
+            Face = face;
+            Suite = suite;
+        }
+
         public override string ToString()
         {
             return base.ToString();

@@ -10,10 +10,14 @@ namespace GameOfWarProject
     {
         public List<Card> GenerateDeck()
         {
-            for (int i = 0; i <= 52; i++)
-            {
+            List<Card> cards = new List<Card>();
 
+            for (int i = 0; i < 52; i++)
+            {
+                cards.Add(new Card((CardFace) Random.Shared.Next(0, 14), (CardSuit) Random.Shared.Next(0, 14)));
             }
+
+            return cards;
         }
 
         public void StartGame()
@@ -52,12 +56,6 @@ namespace GameOfWarProject
             Queue<Card> firstPlayerDeck = new Queue<Card>();
             Queue<Card> secondPlayerDeck = new Queue<Card>();
             DealCardsToPlayers();
-
-
-
-
-
-
         }
     }
 }
