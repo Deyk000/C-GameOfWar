@@ -8,17 +8,72 @@ namespace GameOfWarProject
 {
     internal class GameManager
     {
-        public List<Card> GenerateDeck()
+        int totalMoves = 0;
+        Queue<Card> firstPlayerDeck = new Queue<Card>();
+        Queue<Card> secondPlayerDeck = new Queue<Card>();
+        Queue<Card> pool = new Queue<Card>();
+        List<Card> deck = new List<Card>();
+        List<Card> GenerateDeck()
         {
-            List<Card> cards = new List<Card>();
+            CardFace[] faces = (CardFace[])Enum.GetValues(typeof(CardFace));
+            CardSuit[] suits = (CardSuit[])Enum.GetValues(typeof(CardSuit));
 
-            for (int i = 0; i < 52; i++)
+            for (int suite = 0; suite < suits.Length; suite++)
             {
-                cards.Add(new Card((CardFace) Random.Shared.Next(0, 14), (CardSuit) Random.Shared.Next(0, 14)));
+                for (int face = 0; face < faces.Length; face++)
+                {
+                    CardFace currentFace = faces[face];
+                    CardSuit currentSuit = suits[suite];
+                    deck.Add(new Card (currentFace,currentSuit ));
+                }
             }
-
-            return cards;
+            return deck;
         }
+        void ShuffleDeck(List<Card> deck)
+        {
+            Random random = new Random();
+            for (int i = 0; i < deck.Count; i++)
+            {
+                int FirstCardIndex = random.Next(deck.Count);
+                Card tempCard = deck[FirstCardIndex];
+                deck[FirstCardIndex] = deck[i];
+                deck[i] = tempCard;
+
+            }
+            
+        }
+
+        void DealCardsToPlayers()
+        {
+            while(deck.Count() > 0)
+            {
+                Card[] firstTwoDrawnCards = deck.Take(2).ToArray();
+                deck.RemoveRange(0, 2);
+                firstPlayerDeck.Enqueue(firstTwoDrawnCards[0]);
+                secondPlayerDeck.Enqueue(firstTwoDrawnCards[1]);
+
+            }
+        }
+        Card firstPlayerCard;
+        Card secondPlayerCard;
+
+        
+
+
+
+
+
+
+
+        bool GameHasWinner()
+        {
+            while(!GameHasWinner())
+            {
+                Console.ReadLine();
+                DealCardsToPlayers();
+            }
+        }
+
 
         public void StartGame()
         {
@@ -49,13 +104,16 @@ namespace GameOfWarProject
 ||                                                               ||
 ||                          Have fun!                           ||
 =====================================================================");
-
-
+            
+            pool.Enqueue(firstPlayerCard);
+            pool.Enqueue(secondPlayerCard);
             List<Card> deck = GenerateDeck();
             ShuffleDeck(deck);
-            Queue<Card> firstPlayerDeck = new Queue<Card>();
-            Queue<Card> secondPlayerDeck = new Queue<Card>();
             DealCardsToPlayers();
+
+
         }
+        
+
     }
 }
