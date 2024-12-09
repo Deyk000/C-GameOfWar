@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,8 +56,69 @@ namespace GameOfWarProject
             }
         }
 
+        void AddCardsToWinner(Queue<Card> loserDeck, Queue<Card> winnerDeck)
+        {
+            while(loserDeck.Count > 0)
+            {
+                winnerDeck.Enqueue(loserDeck.Dequeue());
+            }
+        }
+        void AddWarCardsToPool(Queue<Card> pool)
+        {
+            for (int i = 0; i < 3; i++)
+            { 
+                pool.Enqueue(firstPlayerDeck.Dequeue());
+                pool.Enqueue(secondPlayerDeck.Dequeue());
+            }
+        }
+
+        void DetermineRoundWinner(Queue<Card> pool)
+        {
+            if((int)firstPlayerCard.Face > (int)secondPlayerCard.Face)
+            {
+                Console.WriteLine("The first player has won the cards!");
+
+                foreach(var card in pool)
+                {
+                    firstPlayerDeck.Enqueue(card);
+                }
+            }
+            else
+{
+                Console.WriteLine("The second player has won the cards!");
+                foreach (var card in pool)
+                {
+                    secondPlayerDeck.Enqueue(card);
+                }
+            }
+        }
+
         Card firstPlayerCard;
         Card secondPlayerCard;
+
+        void ProcessWar(Queue<Card> pool)
+        {
+            while((int)firstPlayerCard.Face == (int)secondPlayerCard.Face)
+            {
+                Console.WriteLine("WAR!");
+                
+                if (firstPlayerDeck.Count == 4)
+                {
+                    AddCardsToWinner(firstPlayerDeck, secondPlayerDeck);
+                    Console.WriteLine("Fisrt player does not have enough cards to continue playing...");
+                    break;
+                }
+                if (secondPlayerDeck.Count < 4)
+                {
+                    AddCardsToWinner(secondPlayerDeck, firstPlayerDeck);
+                    Console.WriteLine("Second player does not have enough cards to continue playing...");
+                    break;
+                }
+                AddWarCardsToPool(pool);
+                firstPlayerCard = firstPlayerDeck.Dequeue();
+                Console.WriteLine($"First player has drawn: {firstPlayerCard}");
+            }
+        }
 
         public void StartGame()
         {
@@ -88,13 +150,19 @@ namespace GameOfWarProject
 ||                          Have fun!                           ||
 =====================================================================");
             
-            pool.Enqueue(firstPlayerCard);
-            pool.Enqueue(secondPlayerCard);
             List<Card> deck = GenerateDeck();
             ShuffleDeck(deck);
             DealCardsToPlayers();
 
-            //while(!GameHasWinner())
+            while(!GameHasWinner())
+            {
+                Console.ReadLine();
+                DealCardsToPlayers();
+                Queue<Card> pool = new Queue<Card>();
+                pool.Enqueue(firstPlayerCard);
+                pool.Enqueue(secondPlayerCard);
+
+            }
         }
 
         public bool GameHasWinner()
@@ -113,5 +181,6 @@ namespace GameOfWarProject
 
             return false;
         }
+
     }
 }
