@@ -8,5 +8,15 @@ namespace GameOfWarProject
 {
     internal class GameManager
     {
+        public void StartGame()
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+
+
+
+
+
+
+        }
     }
 }

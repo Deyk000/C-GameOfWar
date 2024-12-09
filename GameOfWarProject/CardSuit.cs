@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace GameOfWarProject
 {
-    internal class CardSuit
+    public enum CardSuit
     {
+        Spade = '♠',
+        Club = '♣',
+        Heart = '♥',
+        Diamond = '♦'
+
     }
 }
