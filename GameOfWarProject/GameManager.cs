@@ -150,7 +150,8 @@ namespace GameOfWarProject
 
             while (!GameHasWinner())
             {
-                Console.ReadLine();
+                //Console.ReadLine();
+                Thread.Sleep(100);
 
                 if (!firstPlayerDeck.Any() || !secondPlayerDeck.Any())
                 {
