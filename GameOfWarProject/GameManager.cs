@@ -117,6 +117,7 @@ namespace GameOfWarProject
                 AddWarCardsToPool(pool);
                 firstPlayerCard = firstPlayerDeck.Dequeue();
                 Console.WriteLine($"First player has drawn: {firstPlayerCard}");
+                // Process war is not finished
             }
         }
 
