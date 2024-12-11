@@ -23,7 +23,7 @@ namespace GameOfWarProject
                 {
                     CardFace currentFace = faces[face];
                     CardSuit currentSuit = suits[suite];
-                    deck.Add(new Card (currentFace,currentSuit ));
+                    deck.Add(new Card(currentFace, currentSuit));
                 }
             }
             return deck;
@@ -38,9 +38,15 @@ namespace GameOfWarProject
             }
         }
 
+        void LogTotalCards()
+        {
+            int totalCards = firstPlayerDeck.Count + secondPlayerDeck.Count + pool.Count;
+            Console.WriteLine($"Total cards in play: {totalCards}");
+        }
+
         void DealCardsToPlayers()
         {
-            while(deck.Count() > 0)
+            while (deck.Count() > 0)
             {
                 Card[] firstTwoDrawnCards = deck.Take(2).ToArray();
                 deck.RemoveRange(0, 2);
@@ -52,7 +58,7 @@ namespace GameOfWarProject
 
         void AddCardsToWinner(Queue<Card> loserDeck, Queue<Card> winnerDeck)
         {
-            while(loserDeck.Count > 0)
+            while (loserDeck.Count > 0)
             {
                 winnerDeck.Enqueue(loserDeck.Dequeue());
             }
@@ -60,7 +66,7 @@ namespace GameOfWarProject
         void AddWarCardsToPool(Queue<Card> pool)
         {
             for (int i = 0; i < 3; i++)
-            { 
+            {
                 pool.Enqueue(firstPlayerDeck.Dequeue());
                 pool.Enqueue(secondPlayerDeck.Dequeue());
             }
@@ -68,22 +74,26 @@ namespace GameOfWarProject
 
         void DetermineRoundWinner(Queue<Card> pool)
         {
-            if((int)firstPlayerCard.Face > (int)secondPlayerCard.Face)
+            if ((int)firstPlayerCard.Face > (int)secondPlayerCard.Face)
             {
                 Console.WriteLine("The first player has won the cards!");
-
-                foreach(var card in pool)
+                while (pool.Any())
                 {
-                    firstPlayerDeck.Enqueue(card);
+                    firstPlayerDeck.Enqueue(pool.Dequeue());
+                }
+            }
+            else if ((int)firstPlayerCard.Face < (int)secondPlayerCard.Face)
+            {
+                Console.WriteLine("The second player has won the cards!");
+                while (pool.Any())
+                {
+                    secondPlayerDeck.Enqueue(pool.Dequeue());
                 }
             }
             else
-{
-                Console.WriteLine("The second player has won the cards!");
-                foreach (var card in pool)
-                {
-                    secondPlayerDeck.Enqueue(card);
-                }
+            {
+                Console.WriteLine("It's a tie!");
+                ProcessWar(pool);
             }
         }
 
@@ -92,28 +102,38 @@ namespace GameOfWarProject
 
         void ProcessWar(Queue<Card> pool)
         {
-            while((int)firstPlayerCard.Face == (int)secondPlayerCard.Face)
+            while ((int)firstPlayerCard.Face == (int)secondPlayerCard.Face)
             {
                 Console.WriteLine("WAR!");
-                
-                if (firstPlayerDeck.Count == 4)
+
+                if (firstPlayerDeck.Count < 4 || secondPlayerDeck.Count < 4)
                 {
-                    AddCardsToWinner(firstPlayerDeck, secondPlayerDeck);
-                    Console.WriteLine("Fisrt player does not have enough cards to continue playing...");
-                    break;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("A player does not have enough cards to continue war.");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    AddCardsToWinner(pool, firstPlayerDeck.Count > secondPlayerDeck.Count ? firstPlayerDeck : secondPlayerDeck);
+
+                    EndGame();
                 }
-                if (secondPlayerDeck.Count < 4)
+
+                for (int i = 0; i < 3; i++)
                 {
-                    AddCardsToWinner(secondPlayerDeck, firstPlayerDeck);
-                    Console.WriteLine("Second player does not have enough cards to continue playing...");
-                    break;
+                    pool.Enqueue(firstPlayerDeck.Dequeue());
+                    pool.Enqueue(secondPlayerDeck.Dequeue());
                 }
-                AddWarCardsToPool(pool);
+
                 firstPlayerCard = firstPlayerDeck.Dequeue();
-                Console.WriteLine($"First player has drawn: {firstPlayerCard}");
-                // Process war is not finished
+                secondPlayerCard = secondPlayerDeck.Dequeue();
+                pool.Enqueue(firstPlayerCard);
+                pool.Enqueue(secondPlayerCard);
+
+                Console.WriteLine($"First player has drawn: {firstPlayerCard.GetFace()}");
+                Console.WriteLine($"Second player has drawn: {secondPlayerCard.GetFace()}");
             }
+
+            DetermineRoundWinner(pool);
         }
+
         public void StartGame()
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -148,14 +168,17 @@ namespace GameOfWarProject
             ShuffleDeck(deck);
             DealCardsToPlayers();
 
+            Console.WriteLine($"First player starts with {firstPlayerDeck.Count} cards.");
+            Console.WriteLine($"Second player starts with {secondPlayerDeck.Count} cards.");
+            //LogTotalCards();
+
             while (!GameHasWinner())
             {
-                //Console.ReadLine();
                 Thread.Sleep(100);
 
                 if (!firstPlayerDeck.Any() || !secondPlayerDeck.Any())
                 {
-                    break; // Ensure no further actions if a deck is empty
+                    break;
                 }
 
                 totalMoves++;
@@ -171,7 +194,9 @@ namespace GameOfWarProject
 
                 if ((int)firstPlayerCard.Face > (int)secondPlayerCard.Face)
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("The first player has won the cards!");
+                    Console.ForegroundColor = ConsoleColor.White;
                     foreach (var card in pool)
                     {
                         firstPlayerDeck.Enqueue(card);
@@ -179,7 +204,9 @@ namespace GameOfWarProject
                 }
                 else if ((int)firstPlayerCard.Face < (int)secondPlayerCard.Face)
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("The second player has won the cards!");
+                    Console.ForegroundColor = ConsoleColor.White;
                     foreach (var card in pool)
                     {
                         secondPlayerDeck.Enqueue(card);
@@ -190,21 +217,33 @@ namespace GameOfWarProject
                     ProcessWar(pool);
                 }
 
-                // Print the current card count
-                Console.WriteLine("=============================================================");
+                Console.WriteLine("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
                 Console.WriteLine($"First player currently has {firstPlayerDeck.Count} cards.");
                 Console.WriteLine($"Second player currently has {secondPlayerDeck.Count} cards.");
-                Console.WriteLine("=============================================================");
+                Console.WriteLine("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯");
+
+                //LogTotalCards();
             }
 
             if (firstPlayerDeck.Any())
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"After a total of {totalMoves} moves, the first player has won!");
+                Console.ForegroundColor = ConsoleColor.White;
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"After a total of {totalMoves} moves, the second player has won!");
+                Console.ForegroundColor = ConsoleColor.White;
             }
+
+            EndGame();
+        }
+
+        public void EndGame()
+        {
+            Console.WriteLine("Press Any key to continue");
 
             Console.ReadKey();
 
@@ -213,7 +252,6 @@ namespace GameOfWarProject
             MainMenuScreen screen = new MainMenuScreen();
             screen.StartMenu();
         }
-
 
         public bool GameHasWinner()
         {
