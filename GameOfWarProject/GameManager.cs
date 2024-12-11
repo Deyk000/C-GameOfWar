@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GameOfWarProject
 {
@@ -32,16 +30,12 @@ namespace GameOfWarProject
         }
         void ShuffleDeck(List<Card> deck)
         {
-            Random random = new Random();
-            for (int i = 0; i < deck.Count; i++)
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+            for (int i = deck.Count - 1; i > 0; i--)
             {
-                int FirstCardIndex = random.Next(deck.Count);
-                Card tempCard = deck[FirstCardIndex];
-                deck[FirstCardIndex] = deck[i];
-                deck[i] = tempCard;
-
+                int swapIndex = random.Next(i + 1);
+                (deck[i], deck[swapIndex]) = (deck[swapIndex], deck[i]);
             }
-            
         }
 
         void DealCardsToPlayers()
@@ -120,7 +114,6 @@ namespace GameOfWarProject
                 // Process war is not finished
             }
         }
-
         public void StartGame()
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -150,21 +143,76 @@ namespace GameOfWarProject
 ||                                                               ||
 ||                          Have fun!                           ||
 =====================================================================");
-            
+
             List<Card> deck = GenerateDeck();
             ShuffleDeck(deck);
             DealCardsToPlayers();
 
-            while(!GameHasWinner())
+            while (!GameHasWinner())
             {
                 Console.ReadLine();
-                DealCardsToPlayers();
+
+                if (!firstPlayerDeck.Any() || !secondPlayerDeck.Any())
+                {
+                    break; // Ensure no further actions if a deck is empty
+                }
+
+                totalMoves++;
+                firstPlayerCard = firstPlayerDeck.Dequeue();
+                secondPlayerCard = secondPlayerDeck.Dequeue();
+
+                Console.WriteLine($"First player has drawn: {firstPlayerCard.GetFace()}");
+                Console.WriteLine($"Second player has drawn: {secondPlayerCard.GetFace()}");
+
                 Queue<Card> pool = new Queue<Card>();
                 pool.Enqueue(firstPlayerCard);
                 pool.Enqueue(secondPlayerCard);
 
+                if ((int)firstPlayerCard.Face > (int)secondPlayerCard.Face)
+                {
+                    Console.WriteLine("The first player has won the cards!");
+                    foreach (var card in pool)
+                    {
+                        firstPlayerDeck.Enqueue(card);
+                    }
+                }
+                else if ((int)firstPlayerCard.Face < (int)secondPlayerCard.Face)
+                {
+                    Console.WriteLine("The second player has won the cards!");
+                    foreach (var card in pool)
+                    {
+                        secondPlayerDeck.Enqueue(card);
+                    }
+                }
+                else
+                {
+                    ProcessWar(pool);
+                }
+
+                // Print the current card count
+                Console.WriteLine("=============================================================");
+                Console.WriteLine($"First player currently has {firstPlayerDeck.Count} cards.");
+                Console.WriteLine($"Second player currently has {secondPlayerDeck.Count} cards.");
+                Console.WriteLine("=============================================================");
             }
+
+            if (firstPlayerDeck.Any())
+            {
+                Console.WriteLine($"After a total of {totalMoves} moves, the first player has won!");
+            }
+            else
+            {
+                Console.WriteLine($"After a total of {totalMoves} moves, the second player has won!");
+            }
+
+            Console.ReadKey();
+
+            // Open Main Menu
+            Console.Clear();
+            MainMenuScreen screen = new MainMenuScreen();
+            screen.StartMenu();
         }
+
 
         public bool GameHasWinner()
         {
