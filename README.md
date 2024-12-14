@@ -108,9 +108,6 @@ The entry point of the application. It initializes the main menu and starts the 
 
 This project was developed as a collaborative team effort with contributions from coding, testing, and presenting to documentation.
 
-### GitHub Repository
-[Game Of War Repository](https://github.com/Deyk000/C-GameOfWar)
-
 ---
 
 ## Acknowledgments
