@@ -174,7 +174,7 @@ namespace GameOfWarProject
 
             while (!GameHasWinner())
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1500);
 
                 if (!firstPlayerDeck.Any() || !secondPlayerDeck.Any())
                 {
@@ -196,7 +196,7 @@ namespace GameOfWarProject
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("The first player has won the cards!");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = Program.GlobalSettings.defaultForeColor;
                     foreach (var card in pool)
                     {
                         firstPlayerDeck.Enqueue(card);
@@ -206,7 +206,7 @@ namespace GameOfWarProject
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("The second player has won the cards!");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = Program.GlobalSettings.defaultForeColor;
                     foreach (var card in pool)
                     {
                         secondPlayerDeck.Enqueue(card);
@@ -229,13 +229,13 @@ namespace GameOfWarProject
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"After a total of {totalMoves} moves, the first player has won!");
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = Program.GlobalSettings.defaultForeColor;
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"After a total of {totalMoves} moves, the second player has won!");
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = Program.GlobalSettings.defaultForeColor;
             }
 
             EndGame();
